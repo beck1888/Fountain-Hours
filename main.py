@@ -3,6 +3,7 @@ import streamlit as st
 import hour_manager as hm
 import datetime
 import json
+import pytz
 
 ## Setup the streamlit web app
 st.set_page_config(page_title='The Fountain', page_icon='🍫', layout='centered')
@@ -80,26 +81,41 @@ with st.expander('Show debug info', expanded=False):
     st.markdown('**Calculated time slot:** ' + str(hm.find_time_slot(0, hm.get_todays_schedule())))
     st.markdown('**Calculated open status:** ' + str(hm.is_open()))
     st.markdown('**Calculated time until open:** ' + str(hm.how_long_to_open()))
+
     st.divider()
     st.markdown('## Data sources')
-    st.markdown('**System timestamp:** ' + str(datetime.datetime.now()))
-    st.markdown('**Formatted system timestamp:** ' + datetime.datetime.now().strftime("%I:%M %p"))
+    st.markdown("### Adjusted time information")
+    st.markdown("*Because the server is not in the client timezone,* `pytz` *is used to convert the timestamp into Lake Tahoe time zone (aka PST). The adjusted and relevant time info is shown here.*")
+    st.markdown('**Current timestamp in Lake Tahoe time zone:** ' + str(datetime.datetime.now(pytz.timezone('America/Los_Angeles'))))
+    st.markdown('**Formatted current system timestamp in Lake Tahoe time zone:** ' + datetime.datetime.now(pytz.timezone('America/Los_Angeles')).strftime("%I:%M %p"))
+    st.markdown("**Lake Tahoe time zone:** " + str(pytz.timezone('America/Los_Angeles')))
+    st.markdown("### Server time information")
+    st.markdown('**Server timestamp:** ' + str(datetime.datetime.now()))
+    st.markdown('**Formatted server system timestamp:** ' + datetime.datetime.now().strftime("%I:%M %p"))
+    st.markdown('**Server time zone:** ' + str(datetime.datetime.now().tzinfo))
 
+
+    st.divider()
     st.markdown('**Full schedule from json file:**')
 
+    st.markdown('**Easy to read, perfectly copied table of times from sign outside store**')
+    table_of_times = """
+    | Day       | Morning      | Afternoon    | Evening         |
+    |-----------|--------------|--------------|-----------------|
+    | Sunday    | 9am - 12pm   | 1pm - 5:45pm | 9pm - 10:30pm   |
+    | Monday    | 9am - 12pm   | 1pm - 5:45pm | 7:30pm - 10pm   |
+    | Tuesday   | 9am - 12pm   | 1pm - 5:45pm | 7:30pm - 10pm   |
+    | Wednesday | 9am - 11am   | 2pm - 2:45pm | 8:30pm - 10:30pm|
+    | Thursday  | 9am - 12pm   | 1pm - 5:45pm | 9pm - 10:30pm   |
+    | Friday    | 9am - 12pm   | 1pm - 5:45pm | 9:15pm - 10:45pm|
+    | Saturday  | Closed       | Closed       | 9pm - 10pm      |
+    """
+    st.markdown(table_of_times)
+
+    st.markdown("**Actual image of the schedule**")
+    st.image('sign.jpeg', width=400)
+
+    st.markdown('**Full schedule from the json file**')
     with open('schedule.json', 'r') as f:
         st.json(json.load(f))
 
-    st.markdown('**Table of times from sign outside store**')
-    table_of_times = """
-| Day       | Morning      | Afternoon    | Evening         |
-|-----------|--------------|--------------|-----------------|
-| Sunday    | 9am - 12pm   | 1pm - 5:45pm | 9pm - 10:30pm   |
-| Monday    | 9am - 12pm   | 1pm - 5:45pm | 7:30pm - 10pm   |
-| Tuesday   | 9am - 12pm   | 1pm - 5:45pm | 7:30pm - 10pm   |
-| Wednesday | 9am - 11am   | 2pm - 2:45pm | 8:30pm - 10:30pm|
-| Thursday  | 9am - 12pm   | 1pm - 5:45pm | 9pm - 10:30pm   |
-| Friday    | 9am - 12pm   | 1pm - 5:45pm | 9:15pm - 10:45pm|
-| Saturday  | Closed       | Closed       | 9pm - 10pm      |
-"""
-    st.markdown(table_of_times)

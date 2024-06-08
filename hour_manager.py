@@ -1,55 +1,30 @@
 import json
 import datetime
+import pytz
 
 def minutes_into_day() -> int:
-    """Get the number of minutes into the current day
-    
-    Args:
-        None
-    
-    Returns:
-        int: The number of minutes into the current day
-    """
-    now = datetime.datetime.now()
+    """Get the number of minutes into the current day in Lake Tahoe (Pacific Time Zone)"""
+    pacific = pytz.timezone("America/Los_Angeles")
+    now = datetime.datetime.now(pacific)
     current_time = now.replace(hour=0, minute=0, second=0, microsecond=0)
     delta = now - current_time
     minutes = delta.total_seconds() / 60
     return int(minutes)
 
 def get_day() -> str:
-    """Get the current day of the week
-    
-    Args:
-        None
-    
-    Returns:
-        str: The current day of the week
-    """
-    return datetime.datetime.now().strftime("%A")
+    """Get the current day of the week in Lake Tahoe (Pacific Time Zone)"""
+    pacific = pytz.timezone("America/Los_Angeles")
+    now = datetime.datetime.now(pacific)
+    return now.strftime("%A")
 
 def get_todays_schedule() -> dict:
-    """Get the schedule for the current day
-    
-    Args:
-        None
-    
-    Returns:
-        dict: The schedule for the current day
-    """
+    """Get the schedule for the current day"""
     with open("schedule.json", "r") as f:
         schedule = json.load(f)
     return schedule[get_day()]
 
 def find_time_slot(minutes: int, schedule: dict) -> str:
-    """Find the current time slot based on the number of minutes into the day
-    
-    Args:
-        minutes (int): Number of minutes into the day
-        schedule (dict): The schedule for the current day
-    
-    Returns:
-        str: The time slot range in the format 'start-end'
-    """
+    """Find the current time slot based on the number of minutes into the day"""
     for time_range in schedule:
         start, end = map(int, time_range.split('-'))
         if start <= minutes <= end:
@@ -57,14 +32,7 @@ def find_time_slot(minutes: int, schedule: dict) -> str:
     return None  # Return None if no matching time slot is found
 
 def is_open() -> bool:
-    """Checks what time slot it is, and returns true if the slot is open or not
-    
-    Args:
-        None
-    
-    Returns:
-        bool: True if the slot is open, False if it is closed
-    """
+    """Checks what time slot it is, and returns true if the slot is open or not"""
     minutes = minutes_into_day()
     schedule = get_todays_schedule()
     time_slot = find_time_slot(minutes, schedule)
@@ -73,14 +41,7 @@ def is_open() -> bool:
     return False  # Default to False if no matching time slot is found
 
 def how_long_to_open() -> int:
-    """Gets the number of minutes until the next open time slot
-    
-    Args:
-        None
-        
-    Returns:
-        int: The number of minutes until the next open time slot, or 0 if already open, or -1 if no more open slots today
-    """
+    """Gets the number of minutes until the next open time slot"""
     minutes = minutes_into_day()
     schedule = get_todays_schedule()
     
