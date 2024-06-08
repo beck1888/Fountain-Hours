@@ -25,17 +25,7 @@ def get_day() -> str:
     Returns:
         str: The current day of the week
     """
-    # return datetime.datetime.now().strftime("%A")
-    day_code_conversion = {
-        "mon": "Monday",
-        "tue": "Tuesday",
-        "wed": "Wednesday",
-        "thu": "Thursday",
-        "fri": "Friday",
-        "sat": "Saturday",
-        "sun": "Sunday"
-    }
-    return day_code_conversion[input("Enter a day of the week as a three letter abbreviation: ").lower()]
+    return datetime.datetime.now().strftime("%A")
 
 def get_todays_schedule() -> dict:
     """Get the schedule for the current day
@@ -75,16 +65,43 @@ def is_open() -> bool:
     Returns:
         bool: True if the slot is open, False if it is closed
     """
-    # minutes = minutes_into_day()
-    minutes = int(input("Enter the number of minutes into the day: "))
+    minutes = minutes_into_day()
     schedule = get_todays_schedule()
     time_slot = find_time_slot(minutes, schedule)
     if time_slot:
         return schedule[time_slot]
     return False  # Default to False if no matching time slot is found
 
+def how_long_to_open() -> int:
+    """Gets the number of minutes until the next open time slot
+    
+    Args:
+        None
+        
+    Returns:
+        int: The number of minutes until the next open time slot, or 0 if already open, or -1 if no more open slots today
+    """
+    minutes = minutes_into_day()
+    schedule = get_todays_schedule()
+    
+    # Check if currently open
+    for time_range, status in schedule.items():
+        start, end = map(int, time_range.split('-'))
+        if start <= minutes <= end:
+            if status:
+                return 0
+    
+    # Find the next open slot
+    for time_range, status in sorted(schedule.items(), key=lambda x: int(x[0].split('-')[0])):
+        start, end = map(int, time_range.split('-'))
+        if minutes < start and status:
+            return start - minutes
+    
+    # If no more open slots today
+    return -1
+
 def main() -> None:
-    print(is_open())
+    print(how_long_to_open())
 
 if __name__ == '__main__':
     main()
