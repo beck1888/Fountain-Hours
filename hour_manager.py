@@ -99,9 +99,3 @@ def how_long_to_open() -> int:
     
     # If no more open slots today
     return -1
-
-def main() -> None:
-    print(how_long_to_open())
-
-if __name__ == '__main__':
-    main()
