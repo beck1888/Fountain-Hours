@@ -70,9 +70,10 @@ def convert_minutes_to_12_hour_format(minutes: int) -> str:
 ## Check how long until open again
 wait_time = hm.how_long_to_open()
 if wait_time == 0:
-    html(hm.make_html_message('green', 'The fountain is now open!', '30'))
+    html(hm.make_html_message('green', 'The Fountain Is Now Open!', '30'))
 elif wait_time == -1:
     html(hm.make_html_message('black','The Fountain Is Closed for the Rest of Today.', '30'))
 else:
-    html(hm.make_html_message('red', 'The fountain will open in', '30'))
+    html(hm.make_html_message('red', 'The Fountain is Closed!', '30'))
+    html(hm.make_html_message('orange', 'The Fountain Will Open In', '18'))
     html(hm.make_html_countdown_timer(hm.get_start_minutes_of_next_open_slot()))

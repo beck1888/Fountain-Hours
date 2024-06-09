@@ -121,6 +121,7 @@ def make_html_countdown_timer(minutes_into_day) -> str:
         var display = document.querySelector('#time');
         startTimer(targetTime, display);
     }};
+
     </script>
 
     <style>
