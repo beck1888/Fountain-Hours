@@ -92,11 +92,15 @@ with st.expander('Show debug info', expanded=False):
     st.markdown("### Server time information")
     st.markdown('**Server timestamp:** ' + str(datetime.datetime.now()))
     st.markdown('**Formatted server system timestamp:** ' + datetime.datetime.now().strftime("%I:%M %p"))
-    st.markdown('**Server time zone:** ' + str(datetime.datetime.now().tzinfo))
+    st.markdown('**Server time zone:** ' + str(datetime.datetime.now(datetime.timezone.utc).astimezone().tzinfo))
+
+
+
+
+
 
 
     st.divider()
-    st.markdown('**Full schedule from json file:**')
 
     st.markdown('**Easy to read, perfectly copied table of times from sign outside store**')
     table_of_times = """
