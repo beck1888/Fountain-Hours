@@ -1,15 +1,11 @@
 ## Imports block
 import streamlit as st
 import hour_manager as hm
+from streamlit.components.v1 import html
 import datetime
-import json
-import pytz
 
 ## Setup the streamlit web app
 st.set_page_config(page_title='The Fountain', page_icon='🍫', layout='centered')
-
-## Main streamlit code
-st.title('The Fountain')
 
 ## Functions block
 def pluralize(number: int, singular: str, plural: str) -> str:
@@ -58,68 +54,14 @@ def convert_minutes_to_12_hour_format(minutes: int) -> str:
         am_pm = 'AM'
     return f'{hours}:{minutes:02d} {am_pm}'
 
-## Check if it is open
-if hm.is_open():
-    st.success('It is open!')
+## Main streamlit code
+
+## Check how long until open again
+wait_time = hm.how_long_to_open()
+if wait_time == 0:
+    html(hm.make_html_message('green', 'The fountain is now open!', '30'))
+elif wait_time == -1:
+    html(hm.make_html_message('black','The Fountain Is Closed for the Rest of Today.', '30'))
 else:
-    st.error('It is closed!')
-    ## Check how long until open again
-    wait_time = hm.how_long_to_open()
-    if wait_time == 0:
-        st.success('It is now open!')
-    elif wait_time == -1:
-        st.warning('There are no more open slots today!')
-    else:
-        st.warning(f'It will be open at {convert_minutes_to_12_hour_format(wait_time + hm.minutes_into_day())} ({convert_minutes_to_minutes_and_hours(wait_time)})')
-
-## Debug info
-with st.expander('Show debug info', expanded=False):
-    st.markdown('## Information calculated')
-    st.markdown('**Calculated minutes into the day:** ' + str(hm.minutes_into_day()))
-    st.markdown('**Calculated day:** ' + str(hm.get_day()))
-    st.markdown('**Calculated todays schedule:** ' + str(hm.get_todays_schedule()))
-    st.markdown('**Calculated time slot:** ' + str(hm.find_time_slot(0, hm.get_todays_schedule())))
-    st.markdown('**Calculated open status:** ' + str(hm.is_open()))
-    st.markdown('**Calculated time until open:** ' + str(hm.how_long_to_open()))
-
-    st.divider()
-    st.markdown('## Data sources')
-    st.markdown("### Adjusted time information")
-    st.markdown("*Because the server is not in the client timezone,* `pytz` *is used to convert the timestamp into Lake Tahoe time zone (aka PST). The adjusted and relevant time info is shown here.*")
-    st.markdown('**Current timestamp in Lake Tahoe time zone:** ' + str(datetime.datetime.now(pytz.timezone('America/Los_Angeles'))))
-    st.markdown('**Formatted current system timestamp in Lake Tahoe time zone:** ' + datetime.datetime.now(pytz.timezone('America/Los_Angeles')).strftime("%I:%M %p"))
-    st.markdown("**Lake Tahoe time zone:** " + str(pytz.timezone('America/Los_Angeles')))
-    st.markdown("### Server time information")
-    st.markdown('**Server timestamp:** ' + str(datetime.datetime.now()))
-    st.markdown('**Formatted server system timestamp:** ' + datetime.datetime.now().strftime("%I:%M %p"))
-    st.markdown('**Server time zone:** ' + str(datetime.datetime.now(datetime.timezone.utc).astimezone().tzinfo))
-
-
-
-
-
-
-
-    st.divider()
-
-    st.markdown('**Easy to read, perfectly copied table of times from sign outside store**')
-    table_of_times = """
-    | Day       | Morning      | Afternoon    | Evening         |
-    |-----------|--------------|--------------|-----------------|
-    | Sunday    | 9am - 12pm   | 1pm - 5:45pm | 9pm - 10:30pm   |
-    | Monday    | 9am - 12pm   | 1pm - 5:45pm | 7:30pm - 10pm   |
-    | Tuesday   | 9am - 12pm   | 1pm - 5:45pm | 7:30pm - 10pm   |
-    | Wednesday | 9am - 11am   | 2pm - 2:45pm | 8:30pm - 10:30pm|
-    | Thursday  | 9am - 12pm   | 1pm - 5:45pm | 9pm - 10:30pm   |
-    | Friday    | 9am - 12pm   | 1pm - 5:45pm | 9:15pm - 10:45pm|
-    | Saturday  | Closed       | Closed       | 9pm - 10pm      |
-    """
-    st.markdown(table_of_times)
-
-    st.markdown("**Actual image of the schedule**")
-    st.image('sign.jpeg', width=400)
-
-    st.markdown('**Full schedule from the json file**')
-    with open('schedule.json', 'r') as f:
-        st.json(json.load(f))
-
+    html(hm.make_html_message('red', 'The fountain will open in', '30'))
+    html(hm.make_html_countdown_timer(hm.get_start_minutes_of_next_open_slot()))
