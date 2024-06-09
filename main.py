@@ -2,10 +2,21 @@
 import streamlit as st
 import hour_manager as hm
 from streamlit.components.v1 import html
-import datetime
 
 ## Setup the streamlit web app
 st.set_page_config(page_title='The Fountain', page_icon='🍫', layout='centered')
+
+## Remove the whitespace from the top bar
+st.markdown("""
+        <style>
+               .block-container {
+                    padding-top: 1rem;
+                    padding-bottom: 0rem;
+                    padding-left: 5rem;
+                    padding-right: 5rem;
+                }
+        </style>
+        """, unsafe_allow_html=True)
 
 ## Functions block
 def pluralize(number: int, singular: str, plural: str) -> str:
