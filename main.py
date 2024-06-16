@@ -4,7 +4,7 @@ import hour_manager as hm
 from streamlit.components.v1 import html
 
 ## Setup the streamlit web app
-st.set_page_config(page_title='The Fountain', page_icon='🍫', layout='centered')
+st.set_page_config(page_title='The Fountain', page_icon='🍫', layout='wide')
 
 ## Remove the whitespace from the top bar
 st.markdown("""
